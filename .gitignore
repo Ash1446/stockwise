@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+*.bak
+*.bak_*
+*.pyc
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+app_backup_width/
+data/sample_sales_upload.csv

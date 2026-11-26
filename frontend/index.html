@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predictive Inventory Intelligence Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--line:#e6e8ec;--ink:#0f1b2d;--muted:#6b7686;--navy:#0f1f33;--blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#dc2626;--r:16px;--mono:'JetBrains Mono',ui-monospace,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;font-size:14px}
+button,input,select{font:inherit;color:inherit}
+.hidden{display:none!important}.muted{color:var(--muted)}
+.ic{width:18px;height:18px;flex:none}
+.eyebrow,.pill,th,.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.brand{display:flex;gap:12px;align-items:center}.brand b{display:block;font-size:13px}.brand small{font:9px var(--mono);letter-spacing:.2em;color:var(--muted)}
+#auth{position:fixed;inset:0;display:flex;background:#fff;z-index:50}
+.auth-l{flex:1;background:#f1f4f8;padding:56px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--line)}
+.auth-l h1{font-size:42px;line-height:1.15;margin:40px 0 16px;letter-spacing:-.02em}
+.auth-l p{color:var(--muted);line-height:1.6;max-width:460px;margin-bottom:28px}
+.bullets{display:grid;gap:14px;color:var(--muted)}.bullets div{display:flex;gap:12px;align-items:center}
+.bullets .ic{width:30px;height:30px;padding:6px;border-radius:50%;background:#e0ecff;color:var(--blue)}
+.credits{border-top:1px solid #d5dbe3;padding-top:18px;font-size:12.5px;color:var(--muted);line-height:1.6}.credits b{color:var(--ink)}
+.auth-r{width:500px;padding:56px;display:flex;flex-direction:column;justify-content:center}
+.auth-r h2{font-size:28px;margin-bottom:6px}.auth-r>.muted{margin-bottom:28px}
+.field{margin-bottom:18px}.field label{display:block;font-weight:600;font-size:13px;margin-bottom:7px}
+.field input,.toolbar input,.toolbar select,.select{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none}
+.field input:focus,.toolbar input:focus,.select:focus{border-color:var(--navy)}
+.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer;background:var(--navy);color:#fff;transition:opacity .15s}.btn:hover{opacity:.88}.btn.full{width:100%}
+.demo{margin-top:22px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fafbfc;font-size:13px}
+.demo button{display:block;background:none;border:0;color:var(--blue);font-weight:600;cursor:pointer;margin-top:6px;text-decoration:underline}
+#app{display:flex;height:100vh}
+.side{width:236px;background:#fff;border-right:1px solid var(--line);padding:20px 16px;display:flex;flex-direction:column;justify-content:space-between}
+.nav{list-style:none;display:grid;gap:4px;margin:28px 0 16px}
+.nav li{display:flex;gap:12px;align-items:center;padding:11px 14px;border-radius:12px;color:var(--muted);cursor:pointer;font-weight:500;transition:background .15s}
+.nav li:hover{background:#f1f4f8;color:var(--ink)}.nav li.active{background:var(--navy);color:#fff;box-shadow:0 6px 14px rgba(15,31,51,.22)}
+.cart{width:100%;display:flex;gap:10px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.cart b{margin-left:auto;background:var(--navy);color:#fff;border-radius:99px;padding:1px 8px;font-size:11px}
+.side small{display:block;margin-top:14px;padding:0 4px;color:var(--muted);font-size:11.5px;line-height:1.5}
+.me{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px}
+.me .av{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+.me b{display:block;font-size:12.5px}.me span{font-size:11px;color:var(--muted)}.me button{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer}
+main{flex:1;overflow-y:auto;padding:32px 44px 48px}
+.view{display:none}.view.active{display:block}
+.head{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.head .row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:3px 10px;background:#fff}.pill:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.head h1{font-size:28px;letter-spacing:-.02em;margin-bottom:6px}.head p{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:0 1px 2px rgba(15,27,45,.04)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.metric{font-size:32px;font-weight:700;margin:10px 0 4px;letter-spacing:-.02em}.metric.g{color:var(--green)}.metric.a{color:var(--amber)}.metric.r{color:var(--red)}
+.card h4{font-size:15px;margin-bottom:4px}.card .sub{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+.chart svg{width:100%;height:auto;display:block;font:10px var(--mono);fill:var(--muted)}
+.chart .grid{stroke:var(--line)}.chart .a{fill:none;stroke:var(--navy);stroke-width:2.2}.chart .b{fill:none;stroke:var(--blue);stroke-width:2.2;stroke-dasharray:5 4}
+.legend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-top:8px}.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle;background:var(--navy)}.legend i.b{background:var(--blue)}
+.donut{display:flex;gap:28px;align-items:center;margin-top:18px}
+.ring{width:150px;height:150px;border-radius:50%;display:grid;place-items:center}.ring div{width:96px;height:96px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-weight:700;font-size:20px}.ring small{display:block;font:9px var(--mono);color:var(--muted);letter-spacing:.14em}
+.key{display:grid;gap:10px}.key i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.fc-top{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}.fc-top .label{display:block;margin-bottom:8px}
+.fc{display:grid;grid-template-columns:1.9fr 1fr;gap:16px}
+.ins-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.ins-top h4{margin:0}
+.trend{width:34px;height:34px;border-radius:50%;display:grid;place-items:center}.trend.dn{background:#fee2e2;color:var(--red)}.trend.up{background:#dcfce7;color:var(--green)}
+.ins p{line-height:1.6;margin-bottom:10px}.ins hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+.ins .st{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;margin-top:16px;padding:0}.stats>div{padding:18px 20px}.stats>div+div{border-left:1px solid var(--line)}.stats b{font-size:24px}
+.note{display:flex;gap:10px;align-items:center;margin-top:16px;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:#f1f4f8;color:var(--muted);font-size:12.5px}.note b{color:var(--ink)}
+.toolbar{display:flex;gap:12px;margin-bottom:14px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}.toolbar input{flex:1}.toolbar select{width:auto}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:12px}
+.prod{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.thumb{position:relative;height:150px;display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,#fff9,transparent 55%),var(--tint);overflow:hidden}
+.thumb span{font-size:62px;filter:drop-shadow(0 8px 10px rgba(15,27,45,.18))}.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.prod .body{padding:14px 16px}.prod h5{font-size:15px;margin:8px 0 3px}.prod .cat{font-size:11.5px;color:var(--muted)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.s-healthy{background:#dcfce7;color:#15803d}.s-low{background:#fef3c7;color:#b45309}.s-out{background:#fee2e2;color:#b91c1c}
+.foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:#fafbfc}
+.foot b{font-size:17px;display:block}.foot small{color:var(--muted);font-size:12px}
+.btn.sm{padding:8px 12px;font-size:12.5px}.btn.off{background:#e6e8ec;color:#94a3b8;cursor:not-allowed}
+.tbl{overflow:auto;padding:0}table{width:100%;border-collapse:collapse;text-align:left;font-size:13.5px}
+th{background:#f4f6f9;padding:13px 16px;font-weight:500}td{padding:14px 16px;border-top:1px solid var(--line)}td small{color:var(--muted)}
+.drawer{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#fff;border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;transition:right .25s;box-shadow:-8px 0 24px rgba(15,27,45,.08)}.drawer.open{right:0}
+.drawer header,.drawer footer{padding:18px 20px;display:flex;justify-content:space-between;align-items:center}.drawer header{border-bottom:1px solid var(--line)}.drawer header button{background:none;border:0;font-size:22px;cursor:pointer}
+.drawer footer{border-top:1px solid var(--line);flex-direction:column;align-items:stretch;gap:12px}.drawer footer div{display:flex;justify-content:space-between}
+#drawer-body{flex:1;overflow:auto;padding:16px 20px;background:var(--bg)}
+.q{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+.mini{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:var(--tint);position:relative;overflow:hidden;flex:none}.mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.who{display:flex;gap:12px;align-items:center}
+.q div{flex:1;font-size:13px}.q small{color:var(--muted)}.q input{width:64px;padding:6px 8px;border:1px solid var(--line);border-radius:8px}.q button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:60}#toast.show{opacity:1;transform:translate(-50%,0)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:1000px){.grid4,@media(max-width:720px){#app{flex-direction:column}.side{width:100%;flex-direction:row;align-items:center;padding:10px;overflow-x:auto;gap:12px}.side small,.brand div,.me div,.cart span{display:none}.nav{display:flex;margin:0}.nav li span{display:none}.drawer{width:100%}}
+</style>
+</head>
+<body>
+
+<!-- Sign in -->
+<section id="auth">
+  <div class="auth-l">
+    <div>
+      <div class="brand"><div class="logo"><span data-icon="box"></span></div><div><b>Predictive Inventory</b><small>INTELLIGENCE SUITE</small></div></div>
+      <h1>Smarter inventory.<br>Better decisions.</h1>
+      <p>Analyze sales and stock signals to forecast demand, prevent stockouts, and identify potential shrinkage anomalies.</p>
+      <div class="bullets">
+        <div><span data-icon="up"></span>Demand forecasts by SKU (XGBoost &amp; LSTM)</div>
+        <div><span data-icon="shield"></span>Shrinkage flags via Isolation Forest</div>
+        <div><span data-icon="box"></span>100 SKUs across 5 retail categories</div>
+      </div>
+    </div>
+    <div class="credits"><b>Stanley College of Engineering &amp; Technology for Women</b><br>Department of Computer Science &amp; Engineering (2026-27)<br><b>Project Coordinator:</b> MRS.K Naga Neeharika <br><b>Team:</b> Mekala Madhu Mitha | Aasila Malhat | K Suvarna</div>
+  </div>
+  <div class="auth-r">
+    <h2>Welcome back</h2>
+    <p class="muted">Sign in with your assigned operational role.</p>
+    <div class="field"><label for="login-email">Email address</label><input id="login-email" type="email" value="manager@demo.io" placeholder="manager@demo.io or cashier@demo.io"></div>
+    <div class="field"><label for="login-pass">Password</label><input id="login-pass" type="password" value="password123"></div>
+    <button class="btn full" data-act="login">Sign in</button>
+    <div class="demo"><b>Quick demo logins</b>
+      <button data-act="fill" data-email="manager@demo.io">Fill manager credentials </button>
+      <button data-act="fill" data-email="cashier@demo.io">Fill cashier credentials </button></div>
+  </div>
+</section>
+
+<!-- App -->
+<div id="app" class="hidden">
+  <aside class="side">
+    <div>
+      <div class="brand"><div class="logo"><span data-icon="box"></span></div><div><b>Predictive Inventory</b><small>INTELLIGENCE SUITE</small></div></div>
+      <ul class="nav">
+        <li class="active" data-view="dashboard"><span data-icon="dashboard"></span><span>Dashboard</span></li>
+        <li data-view="shop"><span data-icon="shop"></span><span>Shop</span></li>
+        <li data-view="forecast"><span data-icon="up"></span><span>Demand Forecast</span></li>
+        <li data-view="shrinkage"><span data-icon="shield"></span><span>Shrinkage Detection</span></li>
+      </ul>
+      <button class="cart" data-act="drawer"><span data-icon="cart"></span><span>Restock queue</span><b id="cart-count">0</b></button>
+      <small><span id="total-sku-count">100</span> synthetic SKUs. Every metric in this workspace is demo data.</small>
+    </div>
+    <div class="me"><div class="av" id="user-initials">SM</div><div><b id="user-name">Store Manager</b><span id="user-role">Manager access</span></div>
+      <button data-act="logout" title="Sign out" aria-label="Sign out"><span data-icon="out"></span></button></div>
+  </aside>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="view-dashboard" class="view active">
+      <div class="head"><div class="row"><span class="eyebrow">Dashboard</span><span class="pill">Demo data</span></div>
+        <h1>Inventory health at a glance</h1><p>All 100 demo SKUs: what is healthy, what needs a reorder, and where records disagree.</p></div>
+      <div class="grid4">
+        <div class="card"><span class="label">Total products</span><div class="metric" id="m-total"></div><div class="muted">Across 5 categories</div></div>
+        <div class="card"><span class="label">Healthy stock</span><div class="metric g" id="m-healthy"></div><div class="muted" id="m-healthy-sub"></div></div>
+        <div class="card"><span class="label">Low stock</span><div class="metric a" id="m-low"></div><div class="muted">Below reorder level</div></div>
+        <div class="card"><span class="label">Out of stock</span><div class="metric r" id="m-out"></div><div class="muted">Needs urgent restock</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h4>Inventory distribution</h4><div class="sub">Stock position</div>
+          <div class="donut"><div class="ring" id="ring"><div><span>100<small>SKUS</small></span></div></div><div class="key" id="key"></div></div></div>
+        <div class="card"><h4>Actual vs predicted demand</h4><div class="sub">Units per day, catalogue-wide, last 14 days</div>
+          <div class="chart" id="dash-chart"></div><div class="legend"><span><i></i>Actual</span><span><i class="b"></i>Predicted</span></div></div>
+      </div>
+      <div class="card tbl"><div style="padding:20px 22px 12px"><h4>Needs attention</h4><div class="sub" id="att-sub" style="margin:0"></div></div>
+        <table><thead><tr><th>Product</th><th>Category</th><th>In stock</th><th>Status</th><th></th></tr></thead><tbody id="att-body"></tbody></table></div>
+    </section>
+
+    <!-- Shop -->
+    <section id="view-shop" class="view">
+      <div class="head"><div class="row"><span class="eyebrow">Shop</span><span class="pill">Demo data</span></div>
+        <h1>Product catalogue</h1><p>Every SKU in the demo store, with live stock from the shared inventory state.</p></div>
+      <div class="toolbar">
+        <input id="shop-search" placeholder="Search products or SKU" aria-label="Search products">
+        <select id="cat-filter" aria-label="Category"><option value="all">All categories</option><option>Grocery</option><option>Beverages</option><option>Produce</option><option>Dairy</option><option>Snacks</option></select>
+        <select id="status-filter" aria-label="Stock status"><option value="all">All stock status</option><option>Healthy</option><option>Low stock</option><option>Out of stock</option></select>
+      </div>
+      <div class="muted" id="count"></div>
+      <div class="products" id="products"></div>
+    </section>
+
+    <!-- Demand forecast -->
+    <section id="view-forecast" class="view">
+      <div class="head"><div class="row"><span class="eyebrow">Demand forecast</span><span class="pill">Demo data</span></div>
+        <h1>Projection for a single SKU</h1><p>Compare recent demand with a forward projection, then read it against the stock you actually hold.</p></div>
+      <div class="card fc-top">
+        <div><span class="label">Product</span><select class="select" id="fc-product"></select></div>
+        <div><span class="label">Period</span><select class="select" id="fc-period"><option value="14">Next 14 days</option><option value="30">Next 30 days</option></select></div>
+      </div>
+      <div class="fc">
+        <div class="card"><h4>Historical vs forecast demand</h4><div class="sub" id="fc-title"></div>
+          <div class="chart" id="fc-chart"></div><div class="legend"><span><i></i>Historical</span><span><i class="b"></i>Forecast</span></div></div>
+        <div>
+          <div class="card ins"><div class="ins-top"><h4>Insight</h4><div id="fc-trend"></div></div>
+            <p id="fc-text"></p><p id="fc-cover"></p><hr><div class="st"><span>Current stock status</span><span id="fc-status"></span></div></div>
+          <div class="card stats"><div><span class="label">Projected units</span><br><b id="fc-units"></b><div class="muted">Next 14 days</div></div>
+            <div><span class="label">Reorder level</span><br><b id="fc-reorder"></b><div class="muted">Units on hand trigger</div></div></div>
+        </div>
+      </div>
+      <div class="note"><span data-icon="info"></span><span><b>Planned models: XGBoost / LSTM.</b> This screen is a demo. The projection is drawn from a static dataset and no model is trained or served.</span></div>
+    </section>
+
+    <!-- Shrinkage -->
+    <section id="view-shrinkage" class="view">
+      <div class="head"><div class="row"><span class="eyebrow">Shrinkage detection</span><span class="pill">Demo data</span></div>
+        <h1>Where records and shelf disagree</h1><p>Expected stock is rebuilt from the ledger, then compared with the last physical count. The gap is unexplained variance.</p></div>
+      <div class="grid4">
+        <div class="card"><span class="label">Flagged SKUs</span><div class="metric r" id="sh-flagged"></div><div class="muted">Out of 100 in catalogue</div></div>
+        <div class="card"><span class="label">Expected units</span><div class="metric" id="sh-exp"></div><div class="muted">Opening + received − sold</div></div>
+        <div class="card"><span class="label">Counted units</span><div class="metric" id="sh-cnt"></div><div class="muted">Last recorded physical count</div></div>
+        <div class="card"><span class="label">Variance</span><div class="metric r" id="sh-var"></div><div class="muted" id="sh-val"></div></div>
+      </div>
+      <div class="card tbl"><table><thead><tr><th>SKU &amp; product</th><th>Category</th><th>Opening</th><th>Received</th><th>Sold</th><th>Expected</th><th>Counted</th><th>Variance</th><th>Likely reason</th></tr></thead><tbody id="sh-body"></tbody></table></div>
+    </section>
+  </main>
+</div>
+
+<!-- Restock drawer -->
+<aside class="drawer" id="drawer" aria-label="Restock queue">
+  <header><h3>Restock queue</h3><button data-act="drawer" aria-label="Close">×</button></header>
+  <div id="drawer-body"></div>
+  <footer><div><span class="muted">Total restock units</span><b id="q-total">0</b></div><button class="btn" data-act="dispatch">Dispatch purchase orders</button></footer>
+</aside>
+<div id="toast" role="status"></div>
+
+<script>
+// Demo data. Seeded, so numbers are the same on every load.
+const TINTS = { Produce: '#e3f4e6', Beverages: '#dff0fb', Dairy: '#fdf3c8', Grocery: '#fde6d3', Snacks: '#efe5fb' };
+
+// [name, pack, category, emoji]
+const PRODUCTS = [
+  ['Alphonso Mangoes', '1 kg', 'Produce', '🥭'], ['Organic Bananas', '6 pc', 'Produce', '🍌'],
+  ['Baby Spinach', '250 g', 'Produce', '🥬'], ['Oat Milk Barista', '1 L', 'Beverages', '🥛'],
+  ['Sourdough Loaf', '1 pc', 'Grocery', '🍞'], ['Greek Yogurt', '500 g', 'Dairy', '🥣'],
+  ['Cold Brew Coffee', '250 ml', 'Beverages', '☕'], ['Avocado Hass', '2 pc', 'Produce', '🥑'],
+  ['Almond Butter', '340 g', 'Snacks', '🥜'], ['Organic Honey', '500 g', 'Grocery', '🍯'],
+  ['Chia Seeds', '250 g', 'Snacks', '🌱'], ['Green Detox Juice', '300 ml', 'Beverages', '🧃'],
+  ['Free-Range Eggs', '12 pc', 'Dairy', '🥚'], ['Quinoa Grain', '500 g', 'Grocery', '🌾'],
+  ['Coconut Water', '1 L', 'Beverages', '🥥'], ['Dark Chocolate 85%', '100 g', 'Snacks', '🍫'],
+  ['Matcha Green Tea', '50 g', 'Beverages', '🍵'], ['Cashew Milk', '1 L', 'Dairy', '🥛'],
+  ['Whole Wheat Pasta', '500 g', 'Grocery', '🍝'], ['Extra Virgin Olive Oil', '500 ml', 'Grocery', '🫒'],
+];
+
+function rng(seed) { // mulberry32
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+
+const stockStatus = s => s === 0 ? 'Out of stock' : s < 25 ? 'Low stock' : 'Healthy';
+
+const CATALOG = Array.from({ length: 100 }, (_, i) => {
+  const r = rng(i + 1), [name, pack, category, emoji] = PRODUCTS[i % PRODUCTS.length];
+  const stock = Math.floor(r() * 120);
+  // To use a real photo, set img: 'assets/img/<file>.jpg' on a product.
+  return { n: i, id: `SKU-${1001 + i}`, name, pack, category, emoji, img: null,
+           price: 40 + Math.floor(r() * 450), stock, status: stockStatus(stock) };
+});
+
+// Shrinkage table: [name, sku, category, opening, received, sold, expected, counted, reason]
+const SHRINKAGE = [
+  ['Oat Milk Barista (1 L)', 'BE-042', 'Beverages', 0, 131, 120, 11, 0, 'Cooler stock pulled for sampling'],
+  ['Sourdough Loaf', 'GR-812', 'Grocery', 14, 80, 65, 29, 18, 'Spoilage / shelf-life expiration'],
+  ['Greek Yogurt (500g)', 'DA-209', 'Dairy', 5, 50, 38, 17, 12, 'Misplacement or unrecorded tasting'],
+];
+const SHRINK_SUMMARY = { flagged: 10, expected: 659, counted: 554, variance: 105, value: 40728 };
+
+// Wikipedia article whose lead photo is used as the product image (fetched in the browser, see loadPhotos).
+const WIKI = {
+  'Alphonso Mangoes': 'Mango', 'Organic Bananas': 'Banana', 'Baby Spinach': 'Spinach', 'Oat Milk Barista': 'Oat_milk',
+  'Sourdough Loaf': 'Sourdough', 'Greek Yogurt': 'Strained_yogurt', 'Cold Brew Coffee': 'Cold_brew', 'Avocado Hass': 'Avocado',
+  'Almond Butter': 'Almond_butter', 'Organic Honey': 'Honey', 'Chia Seeds': 'Chia', 'Green Detox Juice': 'Juice',
+  'Free-Range Eggs': 'Egg_as_food', 'Quinoa Grain': 'Quinoa', 'Coconut Water': 'Coconut_water', 'Dark Chocolate 85%': 'Dark_chocolate',
+  'Matcha Green Tea': 'Matcha', 'Cashew Milk': 'Nut_milk', 'Whole Wheat Pasta': 'Pasta', 'Extra Virgin Olive Oil': 'Olive_oil',
+};
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const inr = n => '₹' + n.toLocaleString('en-IN');
+
+const ICONS = {
+  dashboard: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+  shop: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  up: '<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+  down: '<path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  cart: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+};
+const icon = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+
+const state = { user: null, queue: new Map() }; // queue: sku id -> quantity
+
+/* ---------- charts ---------- */
+const smooth = pts => pts.map(([x, y], i) => {
+  if (!i) return `M${x},${y}`;
+  const mx = (pts[i - 1][0] + x) / 2;
+  return `C${mx},${pts[i - 1][1]} ${mx},${y} ${x},${y}`;
+}).join(' ');
+
+function lineChart(el, series, labels, split) {
+  const W = 640, H = 270, L = 34, R = 10, T = 12, B = 28, n = labels.length;
+  const max = Math.ceil(Math.max(...series.flatMap(s => s.data.filter(v => v != null))) / 4) * 4 || 4;
+  const x = i => L + i * (W - L - R) / (n - 1), y = v => T + (1 - v / max) * (H - T - B);
+  let g = '';
+  for (let t = 0; t <= 4; t++) { const v = max / 4 * t;
+    g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 8}" y="${y(v) + 3}" text-anchor="end">${v}</text>`; }
+  const step = Math.ceil(n / 9);
+  labels.forEach((l, i) => { if (i % step === 0) g += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${l}</text>`; });
+  if (split != null) g += `<line x1="${x(split)}" x2="${x(split)}" y1="${T + 14}" y2="${H - B}" stroke="#cbd2db" stroke-dasharray="3 3"/><text x="${x(split) - 6}" y="${T + 8}" text-anchor="end">forecast</text>`;
+  series.forEach(s => { const pts = s.data.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
+    g += `<path class="${s.cls}" d="${smooth(pts)}"/>`; });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`;
+}
+
+const dayLabel = ago => new Date(Date.now() - ago * 864e5).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+/* ---------- dashboard ---------- */
+function renderDashboard() {
+  const c = s => CATALOG.filter(p => p.status === s).length;
+  const [h, l, o] = [c('Healthy'), c('Low stock'), c('Out of stock')], N = CATALOG.length;
+  $('#m-total').textContent = N; $('#m-healthy').textContent = h; $('#m-low').textContent = l; $('#m-out').textContent = o;
+  $('#m-healthy-sub').textContent = `${Math.round(h / N * 100)}% of catalogue`;
+  $('#ring').style.background = `conic-gradient(var(--green) 0 ${h}%,#f59e0b ${h}% ${h + l}%,var(--red) ${h + l}% 100%)`;
+  $('#key').innerHTML = [['var(--green)', 'Healthy', h], ['#f59e0b', 'Low stock', l], ['var(--red)', 'Out of stock', o]]
+    .map(([col, t, v]) => `<div><i style="background:${col}"></i>${t}: <b>${v} (${Math.round(v / N * 100)}%)</b></div>`).join('');
+  const r = rng(99), actual = Array.from({ length: 14 }, () => Math.round(480 + r() * 180));
+  const pred = actual.map(v => Math.round(v + (r() - .5) * 70));
+  lineChart($('#dash-chart'), [{ data: actual, cls: 'a' }, { data: pred, cls: 'b' }], actual.map((_, i) => dayLabel(14 - i)));
+}
+
+/* ---------- shop ---------- */
+function thumb(p, cls = 'thumb') {
+  // The emoji sits underneath as a fallback; the photo covers it once it loads.
+  const img = p.img ? `<img src="${p.img.replace(/\/\d+px-/, '/640px-')}" data-alt="${p.img}" alt="${p.name}" loading="lazy"
+    onerror="this.src!==this.dataset.alt?this.src=this.dataset.alt:this.remove()">` : '';
+  return `<div class="${cls}" style="--tint:${TINTS[p.category]}"><span>${p.emoji}</span>${img}</div>`;
+}
+
+async function loadPhotos() {
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem('pi-photos') || '{}'); } catch {}
+  await Promise.all([...new Set(Object.values(WIKI))].filter(t => !cache[t]).map(async t => {
+    try { const j = await (await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${t}`)).json();
+      if (j.thumbnail?.source) cache[t] = j.thumbnail.source; } catch {}
+  }));
+  try { localStorage.setItem('pi-photos', JSON.stringify(cache)); } catch {}
+  CATALOG.forEach(p => { p.img = p.img || cache[WIKI[p.name]] || null; });
+  renderProducts(); renderQueue(); renderAttention();
+}
+
+/* ---------- needs attention ---------- */
+function renderAttention() {
+  const all = CATALOG.filter(p => p.status !== 'Healthy'), list = [...all].sort((a, b) => a.stock - b.stock).slice(0, 8);
+  const cls = { 'Low stock': 's-low', 'Out of stock': 's-out' }, manager = state.user?.role === 'Manager';
+  $('#att-sub').textContent = `${all.length} SKUs are low or out of stock. Showing the ${list.length} most urgent.`;
+  $('#att-body').innerHTML = list.map(p => `<tr>
+    <td><div class="who">${thumb(p, 'mini')}<div><b>${p.name} (${p.pack})</b><br><small>${p.id}</small></div></div></td>
+    <td>${p.category}</td><td><b>${p.stock}</b></td><td><span class="badge ${cls[p.status]}">${p.status}</span></td>
+    <td style="text-align:right">${manager ? (state.queue.has(p.id) ? '<span class="muted">Queued</span>'
+      : `<button class="btn sm" data-act="restock" data-id="${p.id}">+ Restock</button>`) : '<span class="muted">View only</span>'}</td></tr>`).join('');
+}
+
+function renderProducts() {
+  const q = $('#shop-search').value.toLowerCase(), cat = $('#cat-filter').value, st = $('#status-filter').value;
+  const list = CATALOG.filter(p => (cat === 'all' || p.category === cat) && (st === 'all' || p.status === st) &&
+    (p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q)));
+  const cls = { 'Healthy': 's-healthy', 'Low stock': 's-low', 'Out of stock': 's-out' };
+  const manager = state.user?.role === 'Manager';
+  $('#count').textContent = `Showing ${list.length} of ${CATALOG.length} products`;
+  $('#products').innerHTML = list.map(p => `
+    <article class="prod"><div>${thumb(p)}<div class="body">
+      <span class="badge ${cls[p.status]}">${p.status}</span><h5>${p.name} (${p.pack})</h5><div class="cat">${p.category} · ${p.id}</div></div></div>
+      <div class="foot"><div><b>${inr(p.price)}</b><small>${p.stock} in stock</small></div>
+      ${manager ? `<button class="btn sm" data-act="restock" data-id="${p.id}">+ Restock</button>`
+                : '<button class="btn sm off" disabled title="Managers only">View only</button>'}</div></article>`).join('')
+    || '<p class="muted">No products match these filters.</p>';
+}
+
+/* ---------- forecast ---------- */
+function forecastFor(p, days) {
+  const r = rng(p.n * 7919 + 13), base = 3 + r() * 8, sum = a => a.reduce((s, v) => s + v, 0);
+  const hist = Array.from({ length: 14 }, () => Math.max(1, Math.round(base + (r() - .5) * base * .7)));
+  const avgH = sum(hist) / 14, trend = .8 + r() * .4;
+  const fc = Array.from({ length: days }, () => Math.max(1, Math.round(avgH * trend + (r() - .5) * 1.6)));
+  return { hist, fc, avgH, avgF: sum(fc) / days, total: sum(fc.slice(0, 14)) };
+}
+
+function renderForecast() {
+  const p = CATALOG[+$('#fc-product').value], days = +$('#fc-period').value, f = forecastFor(p, days);
+  const labels = [...f.hist.map((_, i) => dayLabel(14 - i)), ...f.fc.map((_, i) => `+${i + 1}d`)];
+  lineChart($('#fc-chart'), [
+    { data: [...f.hist, ...Array(days).fill(null)], cls: 'a' },
+    { data: [...Array(13).fill(null), f.hist[13], ...f.fc], cls: 'b' }], labels, 13);
+  $('#fc-title').textContent = `${p.name} (${p.pack}) · 14 days history and ${days} days ahead, units per day`;
+  const delta = Math.round((f.avgF - f.avgH) / f.avgH * 100), down = delta < 0, cover = (p.stock / f.avgF).toFixed(1);
+  $('#fc-trend').className = `trend ${down ? 'dn' : 'up'}`; $('#fc-trend').innerHTML = icon(down ? 'down' : 'up');
+  $('#fc-text').innerHTML = `Projected demand for <b>${p.name} (${p.pack})</b> is <b>${down ? 'down' : 'up'} ${Math.abs(delta)}%</b> versus the last 14 days, averaging about ${Math.round(f.avgF)} units a day.`;
+  $('#fc-cover').innerHTML = `Stock on hand is <b>${p.stock} units</b>, roughly <b>${cover} days</b> of cover at that rate.`;
+  const cls = { 'Healthy': 's-healthy', 'Low stock': 's-low', 'Out of stock': 's-out' };
+  $('#fc-status').innerHTML = `<span class="badge ${cls[p.status]}">${p.status}</span>`;
+  $('#fc-units').textContent = f.total; $('#fc-reorder').textContent = Math.round(f.avgF * 10 + 10);
+}
+
+/* ---------- shrinkage ---------- */
+function renderShrinkage() {
+  const s = SHRINK_SUMMARY;
+  $('#sh-flagged').textContent = s.flagged; $('#sh-exp').textContent = s.expected; $('#sh-cnt').textContent = s.counted;
+  $('#sh-var').textContent = `${s.variance} units`; $('#sh-val').textContent = `${inr(s.value)} at retail value`;
+  $('#sh-body').innerHTML = SHRINKAGE.map(([name, sku, cat, op, rec, sold, exp, cnt, why]) => {
+    const v = cnt - exp, pct = Math.floor(Math.abs(v) / exp * 100);
+    return `<tr><td><b>${name}</b><br><small>${sku}</small></td><td>${cat}</td><td>${op}</td><td>${rec}</td><td>${sold}</td><td>${exp}</td><td>${cnt}</td>
+      <td style="color:var(--${pct >= 50 ? 'red' : 'amber'})">${v} (${pct}%)</td><td>${why}</td></tr>`; }).join('');
+}
+
+/* ---------- restock queue ---------- */
+function renderQueue() {
+  const items = [...state.queue].map(([id, q]) => ({ p: CATALOG.find(c => c.id === id), q }));
+  $('#cart-count').textContent = items.length;
+  $('#q-total').textContent = items.reduce((s, i) => s + i.q, 0);
+  $('#drawer-body').innerHTML = items.map(({ p, q }) => `
+    <div class="q">${thumb(p, 'mini')}<div><b>${p.name}</b><br><small>${p.id} · ${p.stock} in stock</small></div>
+    <input type="number" min="1" value="${q}" data-qty="${p.id}" aria-label="Quantity"><button data-act="remove" data-id="${p.id}" aria-label="Remove">×</button></div>`).join('')
+    || '<p class="muted">Nothing queued yet. Use “Restock” on a product.</p>';
+}
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
+function drawer(open) { $('#drawer').classList.toggle('open', open); }
+
+/* ---------- navigation & auth ---------- */
+function showView(id) {
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${id}`));
+  $$('.nav li').forEach(li => li.classList.toggle('active', li.dataset.view === id));
+}
+
+function login() {
+  const email = $('#login-email').value.trim() || 'manager@demo.io';
+  const role = email.includes('cashier') ? 'Cashier' : 'Manager';
+  state.user = { name: `Store ${role}`, role, email };
+  $('#user-name').textContent = state.user.name; $('#user-role').textContent = `${role} access`;
+  $('#user-initials').textContent = 'S' + role[0];
+  $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden');
+  renderProducts(); renderAttention();
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-view]'); if (!t) return;
+  if (t.dataset.view) return showView(t.dataset.view);
+  const { act, id } = t.dataset;
+  if (act === 'login') login();
+  else if (act === 'logout') { drawer(false); $('#app').classList.add('hidden'); $('#auth').classList.remove('hidden'); }
+  else if (act === 'fill') $('#login-email').value = t.dataset.email;
+  else if (act === 'drawer') drawer(!$('#drawer').classList.contains('open'));
+  else if (act === 'restock') { const p = CATALOG.find(c => c.id === id);
+    if (!state.queue.has(id)) state.queue.set(id, Math.max(20, 60 - p.stock)); renderQueue(); renderAttention(); drawer(true); }
+  else if (act === 'remove') { state.queue.delete(id); renderQueue(); }
+  else if (act === 'dispatch') {
+    if (!state.queue.size) return toast('Queue is empty. Add a product first.');
+    toast(`${state.queue.size} purchase order(s) dispatched`); state.queue.clear(); renderQueue(); drawer(false); }
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.qty) { state.queue.set(e.target.dataset.qty, Math.max(1, +e.target.value || 1)); $('#q-total').textContent = [...state.queue.values()].reduce((a, b) => a + b, 0); }
+  if (e.target.matches('#shop-search,#cat-filter,#status-filter')) renderProducts();
+  if (e.target.matches('#fc-product,#fc-period')) renderForecast();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') drawer(false); if (e.key === 'Enter' && e.target.matches('#login-email,#login-pass')) login(); });
+
+/* ---------- init ---------- */
+$$('[data-icon]').forEach(el => el.innerHTML = icon(el.dataset.icon));
+$('#fc-product').innerHTML = CATALOG.slice(0, PRODUCTS.length).map(p => `<option value="${p.n}">${p.name} (${p.pack})</option>`).join('');
+$('#total-sku-count').textContent = CATALOG.length;
+renderDashboard(); renderAttention(); renderForecast(); renderShrinkage(); renderQueue(); loadPhotos();
+</script>
+</body>
+</html>
